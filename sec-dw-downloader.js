@@ -70,64 +70,81 @@ function displayBanner() {
 }
 
 /**
- * Get user inputs
+ * Get user inputs with smart defaults
  */
 async function getUserInputs() {
+    // Show helpful tips
+    console.log(chalk.yellow('\n💡 Tips:'));
+    console.log(chalk.gray('  • Default values are shown in parentheses - press Enter to use them'));
+    console.log(chalk.gray('  • Or type your own value and press Enter'));
+    console.log(chalk.gray('  • Use arrow keys (↑↓) to select download speed\n'));
+    
+    // Calculate smart date defaults (current month)
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const firstDay = `${year}-${month}-01`;
+    const lastDay = new Date(year, now.getMonth() + 1, 0);
+    const lastDayStr = `${year}-${month}-${String(lastDay.getDate()).padStart(2, '0')}`;
+    
     const questions = [
         {
             type: 'input',
             name: 'dateFrom',
-            message: 'Enter START date (YYYY-MM-DD):',
-            default: '2026-01-01',
+            message: 'Start date (YYYY-MM-DD):',
+            default: firstDay,
             validate: (input) => {
                 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
                 if (!dateRegex.test(input)) {
-                    return 'Please enter date in YYYY-MM-DD format';
+                    return 'Please enter date in YYYY-MM-DD format (e.g., 2026-01-01)';
                 }
                 const date = new Date(input);
                 if (isNaN(date.getTime())) {
                     return 'Please enter a valid date';
                 }
                 return true;
-            }
+            },
+            transformer: (input) => chalk.cyan(input) // Show input in cyan color
         },
         {
             type: 'input',
             name: 'dateTo',
-            message: 'Enter END date (YYYY-MM-DD):',
-            default: '2026-01-31',
+            message: 'End date (YYYY-MM-DD):',
+            default: lastDayStr,
             validate: (input) => {
                 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
                 if (!dateRegex.test(input)) {
-                    return 'Please enter date in YYYY-MM-DD format';
+                    return 'Please enter date in YYYY-MM-DD format (e.g., 2026-01-31)';
                 }
                 const date = new Date(input);
                 if (isNaN(date.getTime())) {
                     return 'Please enter a valid date';
                 }
                 return true;
-            }
+            },
+            transformer: (input) => chalk.cyan(input)
         },
         {
             type: 'input',
             name: 'downloadDir',
-            message: 'Enter download folder location:',
+            message: 'Save files to folder:',
             default: './downloads',
             validate: (input) => {
                 if (!input || input.trim() === '') {
                     return 'Please enter a folder path';
                 }
                 return true;
-            }
+            },
+            transformer: (input) => chalk.cyan(input)
         },
         {
             type: 'list',
             name: 'speed',
-            message: 'Select download speed:',
+            message: 'Download speed:',
             choices: [
-                { name: '🐢 Slow (Safest - Less likely to be blocked)', value: 'slow' },
                 { name: '🚶 Normal (Recommended)', value: 'normal' },
-                { name: '🏃 Fast (Faster but riskier)', value: 'fast' }
+                { name: '🐢 Slow (Safest - Avoid blocks)', value: 'slow' },
+                { name: '🏃 Fast (Risky but quick)', value: 'fast' }
             ],
             default: 'normal'
         }
