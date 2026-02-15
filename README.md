@@ -1,0 +1,220 @@
+# 📥 SEC DW Downloader - Easy Setup Guide
+
+A simple, user-friendly tool to download Derivative Warrant Terms & Conditions from SEC Thailand.
+
+---
+
+## 🎯 Quick Start (For Users)
+
+### First Time Setup
+
+#### On Windows:
+
+1. **Install Node.js** (one-time setup)
+   - Download from: https://nodejs.org/
+   - Choose "LTS" version (recommended)
+   - Run installer and click "Next" until finished
+   - Restart your computer
+
+2. **Setup the Downloader**
+   - Extract the downloaded folder to your Desktop
+   - Double-click `start-downloader.bat`
+   - First time will install required files (takes 1-2 minutes)
+
+3. **Create Desktop Shortcut** (optional)
+   - Right-click `start-downloader.bat`
+   - Choose "Send to" → "Desktop (create shortcut)"
+   - Rename shortcut to "Download DW Files"
+
+#### On Mac:
+
+1. **Install Node.js** (one-time setup)
+   - Download from: https://nodejs.org/
+   - Choose "LTS" version (recommended)
+   - Open the downloaded file and follow installation steps
+   - Restart your computer
+
+2. **Setup the Downloader**
+   - Extract the downloaded folder to your Desktop
+   - Open Terminal (Applications → Utilities → Terminal)
+   - Type: `cd ` (with a space at the end)
+   - Drag the extracted folder into Terminal window
+   - Press Enter
+   - Type: `chmod +x start-downloader.sh`
+   - Press Enter
+   - Type: `./start-downloader.sh`
+
+3. **Create Desktop Shortcut** (optional)
+   - Right-click `start-downloader.sh`
+   - Choose "Make Alias"
+   - Drag alias to Desktop
+   - Rename to "Download DW Files"
+
+---
+
+## 💡 How to Use
+
+### Starting the Downloader:
+
+**Windows:** Double-click `start-downloader.bat` (or your desktop shortcut)
+
+**Mac:** Double-click `start-downloader.sh` (or your desktop shortcut)
+
+### Follow the Prompts:
+
+The program will ask you for:
+
+1. **Start Date** 
+   - Format: YYYY-MM-DD
+   - Example: `2026-01-01`
+   - Press Enter to use default
+
+2. **End Date**
+   - Format: YYYY-MM-DD
+   - Example: `2026-01-31`
+   - Press Enter to use default
+
+3. **Download Folder**
+   - Where to save the PDF files
+   - Default: `./downloads` (creates folder next to the program)
+   - Or specify: `C:\Users\YourName\Desktop\SEC_Files`
+   - Press Enter to use default
+
+4. **Download Speed**
+   - Choose: Slow (safest), Normal (recommended), or Fast
+   - Use arrow keys to select, press Enter
+
+5. **Confirm**
+   - Review your settings
+   - Press Enter to start, or type `n` to cancel
+
+### While Downloading:
+
+- A progress bar shows how many files are downloaded
+- Don't close the window!
+- Takes 5-10 minutes for ~100 files
+
+### When Finished:
+
+- Summary shows successful and failed downloads
+- Files are in your chosen download folder
+- Press Enter to close the program
+
+---
+
+## 📁 File Structure
+
+```
+sec-dw-downloader/
+├── start-downloader.bat        ← Windows: Double-click this!
+├── start-downloader.sh         ← Mac: Double-click this!
+├── sec-dw-downloader.js        (main program)
+├── package.json                (dependencies list)
+├── README.md                   (this file)
+│
+└── downloads/                  ← Your PDF files will be here
+    ├── ABC_Terms_123456.pdf
+    ├── XYZ_Terms_123457.pdf
+    ├── .cache/                 (temp files - can delete)
+    └── .progress.json          (tracks progress)
+```
+
+---
+
+## 🔧 Features
+
+✅ **Simple & Easy** - Just answer a few questions  
+✅ **Resume Support** - If interrupted, run again and it continues  
+✅ **Smart Caching** - Faster on repeated downloads  
+✅ **Progress Bar** - See real-time download progress  
+✅ **Error Handling** - Retries failed downloads automatically  
+✅ **Safe** - Won't re-download existing files  
+
+---
+
+## 💾 Downloaded Files
+
+Files are saved with their original names, usually like:
+```
+N-KGI0073-2026VAC14KBANK13C2607BDW_TERMS_AND_CONDITIONS_740646.pdf
+```
+
+Each file contains the Terms & Conditions for one derivative warrant.
+
+---
+
+## ❓ Troubleshooting
+
+### "Node.js not found" error
+- **Solution:** Install Node.js from https://nodejs.org/
+- Make sure to restart your computer after installing
+
+### "Failed to install dependencies"
+- **Solution:** Check your internet connection
+- Try running again (it will retry automatically)
+
+### "No warrants found"
+- **Solution:** Check your date range
+- Make sure dates are correct (YYYY-MM-DD format)
+- Try a different date range
+
+### Downloads are slow
+- **Solution:** Choose "Slow" speed option
+- Check your internet connection
+- Try downloading during off-peak hours
+
+### Program closes immediately
+- **Solution:** Run from Terminal/Command Prompt to see errors
+- Make sure all files are in the same folder
+
+### Files not downloading
+- **Windows:** Run `start-downloader.bat` as Administrator (right-click)
+- **Mac:** Check folder permissions
+- Try a different download folder location
+
+---
+
+## 🆘 Support
+
+If you need help:
+
+1. Check the troubleshooting section above
+2. Look at the error message (write it down)
+3. Check the `.progress.json` file in downloads folder
+4. Contact the developer with:
+   - Operating system (Windows/Mac)
+   - Error message
+   - What you were trying to do
+
+---
+
+## 📝 Tips
+
+💡 **Tip 1:** Create a folder like "SEC_Downloads" on your Desktop and use that as download folder
+
+💡 **Tip 2:** Use "Normal" speed for best balance of speed and reliability
+
+💡 **Tip 3:** If download fails, just run the program again - it will continue where it stopped
+
+💡 **Tip 4:** Downloaded files can be deleted from `.cache` folder to free up space
+
+💡 **Tip 5:** You can run the program multiple times with different date ranges
+
+---
+
+## 🔄 Updating
+
+To get the latest version:
+1. Download new version
+2. Extract to same location (overwrite old files)
+3. Your downloads and progress are safe!
+
+---
+
+## 🎉 That's It!
+
+You're ready to download Derivative Warrant files!
+
+**Just double-click the start file and follow the prompts.**
+
+Happy downloading! 📥
