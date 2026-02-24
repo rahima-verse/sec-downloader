@@ -8,6 +8,7 @@ const cliProgress = require('cli-progress');
 const inquirer = require('inquirer');
 const chalk = require('chalk');
 const figlet = require('figlet');
+const { runIsinFinder } = require('./isin-finder');
 
 /**
  * Configuration (will be updated by user input)
@@ -542,13 +543,39 @@ function displaySummary(results) {
 }
 
 /**
+ * Ask which tool to use
+ */
+async function selectTool() {
+    const { tool } = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'tool',
+            message: 'Select a tool:',
+            choices: [
+                { name: '📄 Documents Downloader  — Download DW terms & conditions from SEC', value: 'downloader' },
+                { name: '🔎 ISIN Finder           — Look up ISIN codes (coming soon)', value: 'isin' }
+            ]
+        }
+    ]);
+    return tool;
+}
+
+/**
  * Main function
  */
 async function main() {
     try {
         // Display banner
         displayBanner();
-        
+
+        // Select tool
+        const tool = await selectTool();
+
+        if (tool === 'isin') {
+            await runIsinFinder({ fetchWithRetry, sleep, config: CONFIG });
+            process.exit(0);
+        }
+
         // Get user inputs
         await getUserInputs();
         
