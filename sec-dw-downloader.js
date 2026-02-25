@@ -9,6 +9,7 @@ const inquirer = require('inquirer');
 const chalk = require('chalk');
 const figlet = require('figlet');
 const { runIsinFinder } = require('./isin-finder');
+const { runColumnMatcher } = require('./column-matcher');
 
 /**
  * Configuration (will be updated by user input)
@@ -553,7 +554,8 @@ async function selectTool() {
             message: 'Select a tool:',
             choices: [
                 { name: '📄 Documents Downloader  — Download DW terms & conditions from SEC', value: 'downloader' },
-                { name: '🔎 ISIN Finder           — Look up ISIN codes (coming soon)', value: 'isin' }
+                { name: '🔎 ISIN Finder           — Look up ISIN codes', value: 'isin' },
+                { name: '🔗 Column Matcher        — Align column B rows to match column A values', value: 'column-matcher' }
             ]
         }
     ]);
@@ -570,6 +572,11 @@ async function main() {
 
         // Select tool
         const tool = await selectTool();
+
+        if (tool === 'column-matcher') {
+            await runColumnMatcher();
+            process.exit(0);
+        }
 
         if (tool === 'isin') {
             await runIsinFinder({ fetchWithRetry, sleep, config: CONFIG });
