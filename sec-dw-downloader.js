@@ -451,7 +451,8 @@ async function fetchWithRetry(
 }
 
 /**
- * Extract TransIDs from listing page
+ * Extract TransIDs and symbols from listing page
+ * Returns array of { transID, symbol } objects
  */
 async function extractTransIDs(cache) {
   console.log(chalk.yellow("\n🔍 Fetching warrant listings..."));
@@ -470,87 +471,37 @@ async function extractTransIDs(cache) {
     }
 
     const $ = cheerio.load(html);
-    const transIDs = [];
+    const entries = [];
 
-    $("table tbody tr").each((index, row) => {
+    $("#gPP02T06 > tbody > tr").each((index, row) => {
       const filingLink = $(row).find("td:last-child a").attr("href");
+      const symbol = $(row).find("td:nth-child(3)").text().trim();
       if (filingLink) {
         const match = filingLink.match(/TransID=(\d+)/);
         if (match && match[1]) {
-          transIDs.push(match[1]);
+          entries.push({ transID: match[1], symbol });
         }
       }
     });
 
-    return transIDs;
+    return entries;
   } catch (error) {
     throw new Error(`Failed to fetch listings: ${error.message}`);
   }
 }
 
 /**
- * Filter TransIDs by global identifier
- * Fetches each detail page button to get the symbol and checks against the filter set.
+ * Filter entries by global identifier (instant, no network calls)
  */
-async function filterByIdentifiers(transIDs, cache, filterSet) {
-  console.log(
-    chalk.yellow(
-      `\n🔎 Filtering ${transIDs.length} warrants by ${filterSet.size} identifiers...`,
-    ),
-  );
-
-  const progressBar = new cliProgress.SingleBar({
-    format:
-      chalk.cyan("Filtering") + " |{bar}| {percentage}% | {value}/{total}",
-    barCompleteChar: "█",
-    barIncompleteChar: "░",
-    hideCursor: true,
-  });
-
-  progressBar.start(transIDs.length, 0);
-
-  const matched = [];
-
-  for (let i = 0; i < transIDs.length; i += CONFIG.concurrentDownloads) {
-    const batch = transIDs.slice(i, i + CONFIG.concurrentDownloads);
-    await Promise.all(
-      batch.map(async (transID) => {
-        const detailURL = `${URLS.base}/public/ipos/IPOSDW01.aspx?TransID=${transID}`;
-        try {
-          let html = cache.get(`detail_${transID}`);
-          if (!html) {
-            await sleep(CONFIG.requestDelay);
-            const response = await fetchWithRetry(detailURL, {
-              headers: { ...BROWSER_HEADERS, Referer: URLS.getListUrl() },
-            });
-            html = response.data;
-            cache.set(`detail_${transID}`, html);
-          }
-
-          const $ = cheerio.load(html);
-          const symbol = $("span#ctl00_ContentPlaceHolder1_lblSymbol")
-            .text()
-            .trim();
-
-          if (symbol && filterSet.has(symbol)) {
-            matched.push(transID);
-          }
-        } catch (error) {
-          // If we can't fetch the detail, skip this TransID
-        }
-        progressBar.increment();
-      }),
-    );
-  }
-
-  progressBar.stop();
-
+function filterByIdentifiers(entries, filterSet) {
+  const before = entries.length;
+  const filtered = entries.filter((e) => e.symbol && filterSet.has(e.symbol));
   console.log(
     chalk.green(
-      `✓ ${matched.length} of ${transIDs.length} warrants matched the filter`,
+      `✓ ${filtered.length} of ${before} warrants matched the filter`,
     ),
   );
-  return matched;
+  return filtered;
 }
 
 /**
@@ -795,31 +746,30 @@ async function main() {
     const cache = new CacheManager(CONFIG.cacheDir);
     const progress = new ProgressTracker(CONFIG.progressFile);
 
-    // Get TransIDs
-    let allTransIDs = await extractTransIDs(cache);
+    // Get TransIDs and symbols from listing page
+    let allEntries = await extractTransIDs(cache);
 
-    if (allTransIDs.length === 0) {
+    if (allEntries.length === 0) {
       console.log(chalk.yellow("⚠️  No warrants found for this date range.\n"));
       process.exit(0);
     }
 
-    console.log(chalk.green(`✓ Found ${allTransIDs.length} warrants`));
+    console.log(chalk.green(`✓ Found ${allEntries.length} warrants`));
 
     // Filter by global identifier if enabled
     if (CONFIG.filterIdentifiers) {
-      allTransIDs = await filterByIdentifiers(
-        allTransIDs,
-        cache,
-        CONFIG.filterIdentifiers,
-      );
+      allEntries = filterByIdentifiers(allEntries, CONFIG.filterIdentifiers);
 
-      if (allTransIDs.length === 0) {
+      if (allEntries.length === 0) {
         console.log(
           chalk.yellow("\n⚠️  No warrants matched the provided identifiers.\n"),
         );
         process.exit(0);
       }
     }
+
+    // Extract just the TransIDs for downloading
+    const allTransIDs = allEntries.map((e) => e.transID);
 
     console.log("");
 
