@@ -11,6 +11,7 @@ const chalk = require("chalk");
 const figlet = require("figlet");
 const { runIsinFinder } = require("./isin-finder");
 const { runColumnMatcher } = require("./column-matcher");
+const { runLinkGenerator } = require("./sec-dw-link-generator");
 
 /**
  * Configuration (will be updated by user input)
@@ -700,6 +701,10 @@ async function selectTool() {
           name: "🔗 Column Matcher        — Align column B rows to match column A values",
           value: "column-matcher",
         },
+        {
+          name: "🌐 Link Generator        — Serve filtered results page for Excel import",
+          value: "link-generator",
+        },
       ],
     },
   ]);
@@ -724,6 +729,11 @@ async function main() {
 
     if (tool === "isin") {
       await runIsinFinder({ fetchWithRetry, sleep, config: CONFIG });
+      process.exit(0);
+    }
+
+    if (tool === "link-generator") {
+      await runLinkGenerator({ fetchWithRetry, sleep });
       process.exit(0);
     }
 
